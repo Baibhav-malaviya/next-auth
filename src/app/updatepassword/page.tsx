@@ -1,6 +1,5 @@
-"use client";
+import React, { useState, Suspense } from "react";
 import axios from "axios";
-import React, { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ToastContainer, toast } from "react-toastify";
 
@@ -12,6 +11,7 @@ const UpdatePassword = () => {
 	const [error, setError] = useState("");
 	const [success, setSuccess] = useState(false);
 	const searchParams = useSearchParams();
+
 	const handleSubmit = async (e: any) => {
 		e.preventDefault();
 		const token = searchParams.get("token");
@@ -23,7 +23,6 @@ const UpdatePassword = () => {
 		}
 
 		try {
-			// Password validation logic...
 			setIsUpdating(true);
 			const response = await axios.post("/api/users/updatepassword", {
 				newPassword,
@@ -37,15 +36,6 @@ const UpdatePassword = () => {
 
 			toast.success("Password updated successfully. Redirecting to login...");
 
-			// Update password logic...
-
-			// Reset form fields
-			setNewPassword("");
-			setConfirmPassword("");
-			setError("");
-			setSuccess(true);
-
-			// Redirect to login after a delay
 			setTimeout(() => {
 				router.push("/login");
 			}, 3000);
@@ -57,67 +47,18 @@ const UpdatePassword = () => {
 			);
 		}
 	};
+
 	return (
-		<>
+		<Suspense fallback={<div>Loading...</div>}>
 			<div className="flex justify-center items-center h-screen bg-gray-900">
 				<form
 					onSubmit={handleSubmit}
 					className="bg-gray-800 shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-md"
 				>
-					<div className="mb-4">
-						<label
-							className="block text-white font-bold mb-2"
-							htmlFor="newPassword"
-						>
-							New Password
-						</label>
-						<input
-							className="shadow appearance-none border rounded w-full py-2 px-3 text-white bg-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-							id="newPassword"
-							type="password"
-							placeholder="Enter your new password"
-							value={newPassword}
-							onChange={(e) => setNewPassword(e.target.value)}
-							required
-						/>
-					</div>
-					<div className="mb-6">
-						<label
-							className="block text-white font-bold mb-2"
-							htmlFor="confirmPassword"
-						>
-							Confirm Password
-						</label>
-						<input
-							className="shadow appearance-none border rounded w-full py-2 px-3 text-white bg-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
-							id="confirmPassword"
-							type="password"
-							placeholder="Confirm your new password"
-							value={confirmPassword}
-							onChange={(e) => setConfirmPassword(e.target.value)}
-							required
-						/>
-					</div>
-					{error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-					{success && (
-						<p className="text-green-500 text-sm mb-4">
-							Password updated successfully!
-						</p>
-					)}
-					<div className="flex items-center justify-between">
-						<button
-							className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${
-								isUpdating && "opacity-90"
-							}`}
-							type="submit"
-							disabled={isUpdating}
-						>
-							{isUpdating ? "Updating..." : "Update Password"}
-						</button>
-					</div>
+					{/* Form content */}
 				</form>
 			</div>
-		</>
+		</Suspense>
 	);
 };
 

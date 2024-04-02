@@ -1,5 +1,4 @@
-"use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -11,7 +10,7 @@ interface VerifyEmailResponse {
 const VerifyEmail = () => {
 	const router = useRouter();
 	const searchParams = useSearchParams();
-	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const [isLoading, setIsLoading] = useState<boolean>(true); // Initially set to true to show loading fallback
 	const [isVerified, setIsVerified] = useState<boolean>(false);
 	const [error, setError] = useState<string>("");
 
@@ -53,38 +52,30 @@ const VerifyEmail = () => {
 		redirectToDashboard();
 	}, [isVerified, router]);
 
-	if (isLoading) {
-		return (
-			<div className="flex justify-center items-center h-screen bg-gray-900">
-				<p className="text-white bg-gray-700/50 rounded p-3">Loading...</p>
-			</div>
-		);
-	}
-
-	if (isVerified) {
-		return (
-			<div className="flex flex-col justify-center items-center h-screen bg-gray-900">
-				<p className="text-white mb-4 bg-gray-700/50 rounded p-3">
-					Email verified successfully!
-				</p>
-				<p className="text-white bg-gray-700/50 rounded p-3">
-					Redirecting to dashboard...
-				</p>
-			</div>
-		);
-	}
-
 	return (
-		<div className="flex flex-col justify-center items-center h-screen bg-gray-900">
-			{error && <p className="text-red-500 mb-4">{error}</p>}
-			<button
-				className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-				onClick={handleVerifyEmail}
-				disabled={isLoading}
-			>
-				{isLoading ? "Loading..." : "Verify Email"}
-			</button>
-		</div>
+		<Suspense fallback={<div>Loading...</div>}>
+			<div className="flex flex-col justify-center items-center h-screen bg-gray-900">
+				{error && <p className="text-red-500 mb-4">{error}</p>}
+				{isVerified ? (
+					<>
+						<p className="text-white mb-4 bg-gray-700/50 rounded p-3">
+							Email verified successfully!
+						</p>
+						<p className="text-white bg-gray-700/50 rounded p-3">
+							Redirecting to dashboard...
+						</p>
+					</>
+				) : (
+					<button
+						className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+						onClick={handleVerifyEmail}
+						disabled={isLoading}
+					>
+						{isLoading ? "Loading..." : "Verify Email"}
+					</button>
+				)}
+			</div>
+		</Suspense>
 	);
 };
 
