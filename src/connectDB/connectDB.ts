@@ -4,7 +4,6 @@ const MONGODB_URI = process.env.MONGODB_URL!;
 const DB_NAME = "nextAuth";
 
 interface ConnectionOptions extends ConnectOptions {
-	useNewUrlParser?: boolean;
 	useUnifiedTopology?: boolean;
 }
 
@@ -17,14 +16,10 @@ async function connectDB() {
 
 	try {
 		const options: ConnectionOptions = {
-			useNewUrlParser: true,
 			useUnifiedTopology: true,
 		};
 
-		const connection = await mongoose.connect(
-			`${MONGODB_URI}/${DB_NAME}`,
-			options
-		);
+		const connection = await mongoose.connect(`${MONGODB_URI}/${DB_NAME}`);
 		cachedConnection = connection.connection;
 
 		cachedConnection.on("error", (err) => {
